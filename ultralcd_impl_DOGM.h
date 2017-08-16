@@ -546,7 +546,7 @@ static void lcd_implementation_status_screen() {
       duration_t elapsed = print_job_timer.duration();
       bool has_days = (elapsed.value > 60*60*24L);
       uint8_t len = elapsed.toDigital(buffer, has_days);
-      u8g.setPrintPos(SD_DURATION_X, 48); // DEFAULT 48
+      u8g.setPrintPos(SD_DURATION_X, 48);
       lcd_print(buffer);
     }
 
@@ -562,7 +562,7 @@ static void lcd_implementation_status_screen() {
     #define INFO_FONT_HEIGHT 8
   #endif
 
-  #define XYZ_BASELINE (32 + INFO_FONT_HEIGHT) //VALOR POR DEFECTO ES 30
+  #define XYZ_BASELINE (30 + INFO_FONT_HEIGHT)
 
   #define X_LABEL_POS  3
   #define X_VALUE_POS 11
@@ -599,9 +599,9 @@ static void lcd_implementation_status_screen() {
   if (PAGE_CONTAINS(XYZ_FRAME_TOP, XYZ_FRAME_TOP + XYZ_FRAME_HEIGHT - 1)) {
 
     #if ENABLED(XYZ_HOLLOW_FRAME)
-//      u8g.drawFrame(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT); // 8: 29-40  7: 29-39 -> SACO EL BORDE
+      u8g.drawFrame(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT); // 8: 29-40  7: 29-39
     #else
-//      u8g.drawBox(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT);   // 8: 30-39  7: 30-37 -> SACO EL BORDE
+      u8g.drawBox(0, XYZ_FRAME_TOP, LCD_PIXEL_WIDTH, XYZ_FRAME_HEIGHT);   // 8: 30-39  7: 30-37
     #endif
 
     if (PAGE_CONTAINS(XYZ_BASELINE - (INFO_FONT_HEIGHT - 1), XYZ_BASELINE)) {
@@ -631,19 +631,17 @@ static void lcd_implementation_status_screen() {
     }
   }
 
-
   //
   // Feedrate
   //
-#define BASELINE_FEEDRATE_LINE         50 //VALOR POR DEFECTO ES 50
 
   if (PAGE_CONTAINS(51 - INFO_FONT_HEIGHT, 49)) {
     lcd_setFont(FONT_MENU);
-    u8g.setPrintPos(3, BASELINE_FEEDRATE_LINE); // VALOR POR DEFECTO 50
+    u8g.setPrintPos(3, 50);
     lcd_print(LCD_STR_FEEDRATE[0]);
 
     lcd_setFont(FONT_STATUSMENU);
-    u8g.setPrintPos(12, BASELINE_FEEDRATE_LINE);// VALOR POR DEFECTO 50
+    u8g.setPrintPos(12, 50);
     lcd_print(itostr3(feedrate_percentage));
     u8g.print('%');
 
@@ -651,15 +649,15 @@ static void lcd_implementation_status_screen() {
     // Filament sensor display if SD is disabled
     //
     #if DISABLED(SDSUPPORT) && ENABLED(FILAMENT_LCD_DISPLAY)
-      u8g.setPrintPos(56, BASELINE_FEEDRATE_LINE);
+      u8g.setPrintPos(56, 50);
       lcd_print(wstring);
-      u8g.setPrintPos(102, BASELINE_FEEDRATE_LINE);
+      u8g.setPrintPos(102, 50);
       lcd_print(mstring);
       u8g.print('%');
       lcd_setFont(FONT_MENU);
-      u8g.setPrintPos(47, BASELINE_FEEDRATE_LINE);
+      u8g.setPrintPos(47, 50);
       lcd_print(LCD_STR_FILAM_DIA);
-      u8g.setPrintPos(93, BASELINE_FEEDRATE_LINE);
+      u8g.setPrintPos(93, 50);
       lcd_print(LCD_STR_FILAM_MUL);
     #endif
   }
@@ -668,7 +666,7 @@ static void lcd_implementation_status_screen() {
   // Status line
   //
 
-  #define STATUS_BASELINE (55 + INFO_FONT_HEIGHT) //POR DEFECTO 55
+  #define STATUS_BASELINE (55 + INFO_FONT_HEIGHT)
 
   if (PAGE_CONTAINS(STATUS_BASELINE + 1 - INFO_FONT_HEIGHT, STATUS_BASELINE)) {
     u8g.setPrintPos(0, STATUS_BASELINE);
