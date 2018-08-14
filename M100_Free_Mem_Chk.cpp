@@ -45,24 +45,23 @@
  *
  * Initial version by Roxy-3D
  */
-#define M100_FREE_MEMORY_DUMPER     // Enable for the `M110 D` Dump sub-command
-#define M100_FREE_MEMORY_CORRUPTOR  // Enable for the `M100 C` Corrupt sub-command
 
 #include "MarlinConfig.h"
 
 #if ENABLED(M100_FREE_MEMORY_WATCHER)
 
-#define TEST_BYTE ((char) 0xE5)
+#define M100_FREE_MEMORY_DUMPER     // Enable for the `M100 D` Dump sub-command
+#define M100_FREE_MEMORY_CORRUPTOR  // Enable for the `M100 C` Corrupt sub-command
 
-extern char command_queue[BUFSIZE][MAX_CMD_SIZE];
+#include "Marlin.h"
+#include "parser.h"
+#include "hex_print_routines.h"
+
+#define TEST_BYTE ((char) 0xE5)
 
 extern char* __brkval;
 extern size_t  __heap_start, __heap_end, __flp;
 extern char __bss_end;
-
-#include "Marlin.h"
-#include "gcode.h"
-#include "hex_print_routines.h"
 
 //
 // Utility functions
@@ -130,7 +129,7 @@ int16_t count_test_bytes(const char * const ptr) {
         }
         SERIAL_CHAR(ccc);
       }
-      SERIAL_EOL;
+      SERIAL_EOL();
       ptr += 16;
       safe_delay(25);
       idle();
@@ -189,19 +188,17 @@ void free_memory_pool_report(char * const ptr, const int16_t size) {
    *  This is useful to check the correctness of the M100 D and the M100 F commands.
    */
   void corrupt_free_memory(char *ptr, const uint16_t size) {
-    if (parser.seen('C')) {
-      ptr += 8;
-      const uint16_t near_top = top_of_stack() - ptr - 250, // -250 to avoid interrupt activity that's altered the stack.
-                     j = near_top / (size + 1);
+    ptr += 8;
+    const uint16_t near_top = top_of_stack() - ptr - 250, // -250 to avoid interrupt activity that's altered the stack.
+                   j = near_top / (size + 1);
 
-      SERIAL_ECHOLNPGM("Corrupting free memory block.\n");
-      for (uint16_t i = 1; i <= size; i++) {
-        char * const addr = ptr + i * j;
-        *addr = i;
-        SERIAL_ECHOPAIR("\nCorrupting address: ", hex_address(addr));
-      }
-      SERIAL_EOL;
+    SERIAL_ECHOLNPGM("Corrupting free memory block.\n");
+    for (uint16_t i = 1; i <= size; i++) {
+      char * const addr = ptr + i * j;
+      *addr = i;
+      SERIAL_ECHOPAIR("\nCorrupting address: ", hex_address(addr));
     }
+    SERIAL_EOL();
   }
 #endif // M100_FREE_MEMORY_CORRUPTOR
 
@@ -229,7 +226,7 @@ void init_free_memory(char *ptr, int16_t size) {
     if (ptr[i] != TEST_BYTE) {
       SERIAL_ECHOPAIR("? address : ", hex_address(ptr + i));
       SERIAL_ECHOLNPAIR("=", hex_byte(ptr[i]));
-      SERIAL_EOL;
+      SERIAL_EOL();
     }
   }
 }
@@ -323,7 +320,7 @@ int check_for_free_memory_corruption(const char * const title) {
   SERIAL_ECHOPGM(" return=");
   if (block_cnt == 1) {
     SERIAL_CHAR('0');       // if the block_cnt is 1, nothing has broken up the free memory
-    SERIAL_EOL;             // area and it is appropriate to say 'no corruption'.
+    SERIAL_EOL();             // area and it is appropriate to say 'no corruption'.
     return 0;
   }
   SERIAL_ECHOLNPGM("true");
